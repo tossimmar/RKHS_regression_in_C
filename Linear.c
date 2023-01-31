@@ -89,7 +89,7 @@ Matrix Matrix_new(int dim0, int dim1) {
 
 Matrix Matrix_init(int dim0, int dim1, ...) {
 	/*
-	Return a matrix of the specified dimensions initialized with the 
+	Initialize a matrix of the specified dimensions with the 
 	specified elements.
 
 	arguments
@@ -101,15 +101,21 @@ Matrix Matrix_init(int dim0, int dim1, ...) {
 		The number of columns of the matrix.
 
 	...
-		The elements to initialize the matrix with.
-
-		Note: must all be of type double.
+		The elements of the matrix (which must be of type double).
 
 	returns
 	-------
 	Matrix
 		The matrix of the specified dimensions initialized with the 
 		specified elements.
+
+	example
+	-------
+	The call Matrix_init(2, 3, 1., 2., 3., 4., 5., 6.) returns the
+	matrix
+
+		[[1., 2., 3.], 
+		 [4., 5., 6.]]
 	*/
 	va_list args;
 	va_start(args, dim1);
@@ -133,13 +139,20 @@ Matrix Matrix_constant(int dim0, int dim1, double c) {
 		The number of columns of the matrix.
 
 	double : c
-		The constant which every element of the matrix is equal to.
+		The value of every element of the matrix.
 
 	returns
 	-------
 	Matrix
-		The matrix of the specified dimensions with all entries equal 
-		to the specified constant.
+		The matrix of the specified dimensions with all 
+		elements equal to the specified constant.
+
+	example
+	-------
+	The call Matrix_constant(2, 3, 1.) returns the matrix
+
+		[[1., 1., 1.], 
+		 [1., 1., 1.]]
 	*/
 	return populate_matrix(Matrix_new(dim0, dim1), Matrix_constant_populate, c);
 }
@@ -159,6 +172,14 @@ Matrix Matrix_identity(int dim) {
 	-------
 	Matrix
 		The identity matrix of the specified dimension.
+
+	example
+	-------
+	The call Matrix_identity(3) returns the matrix
+
+		[[1., 0., 0.], 
+		 [0., 1., 0.], 
+		 [0., 0., 1.]]
 	*/
 	return populate_matrix(Matrix_new(dim, dim), Matrix_identity_populate);
 }
@@ -167,7 +188,7 @@ Matrix Matrix_identity(int dim) {
 
 Matrix Matrix_scalar_mul(Matrix m, double c) {
 	/*
-	Return the specified matrix multiplied by the specified scalar.
+	Scalar multiply the specified matrix by the specified constant.
 
 	arguments
 	---------
@@ -180,7 +201,21 @@ Matrix Matrix_scalar_mul(Matrix m, double c) {
 	returns
 	-------
 	Matrix
-		The specified matrix multiplied by the specified scalar. 
+		The specified matrix multiplied by the specified constant. 
+
+	example
+	-------
+	Suppose that the specified matrix and constant are given by
+
+		    [[1., 1.], 
+		m =  [1., 2.],    and    c = 3. 
+		     [3., 1.]]
+
+	Then, the call Matrix_scalar_mul(m, c) returns the matrix
+
+		[[3., 3.], 
+		 [3., 6.], 
+		 [9., 3.]] 
 	*/
 	return populate_matrix(Matrix_new(Matrix_dim(m, 0), Matrix_dim(m, 1)), Matrix_scalar_mul_populate, m, c);
 }
@@ -203,6 +238,20 @@ Matrix Matrix_add(Matrix m1, Matrix m2) {
 	-------
 	Matrix
 		The sum of the specified matrices.
+
+	example
+	-------
+	Suppose that the specified matrices are given by
+
+		     [[1., 0., 0.],		   [[0., 1., 1.],
+		m1 =  [0., 1., 0.],    and    m2 =  [1., 0., 1.],
+		      [0., 0., 1.]]                 [1., 1., 0.]]
+
+	Then, the call Matrix_add(m1, m2) returns the matrix
+
+		[[1., 1., 1.], 
+		 [1., 1., 1.], 
+		 [1., 1., 1.]]
 	*/
 	assert((Matrix_dim(m1, 0) == Matrix_dim(m2, 0)) && (Matrix_dim(m1, 1) == Matrix_dim(m2, 1)));
 	return populate_matrix(Matrix_new(Matrix_dim(m1, 0), Matrix_dim(m1, 1)), Matrix_add_populate, m1, m2);
@@ -226,6 +275,20 @@ Matrix Matrix_sub(Matrix m1, Matrix m2) {
 	-------
 	Matrix
 		The difference of the specified matrices.
+
+	example
+	-------
+	Suppose that the specified matrices are given by
+
+		     [[1., 0., 0.],		   [[0., 1., 1.],
+		m1 =  [0., 1., 0.],    and    m2 =  [1., 0., 1.],
+		      [0., 0., 1.]]                 [1., 1., 0.]]
+
+	Then, the call Matrix_sub(m1, m2) returns the matrix
+
+		[[ 1., -1., -1.], 
+		 [-1.,  1., -1.], 
+		 [-1., -1.,  1.]]
 	*/
 	assert((Matrix_dim(m1, 0) == Matrix_dim(m2, 0)) && (Matrix_dim(m1, 1) == Matrix_dim(m2, 1)));
 	return populate_matrix(Matrix_new(Matrix_dim(m1, 0), Matrix_dim(m1, 1)), Matrix_sub_populate, m1, m2);
@@ -250,6 +313,20 @@ Matrix Matrix_hadamard(Matrix m1, Matrix m2) {
 	-------
 	Matrix
 		The Hadamard product of the specified matrices.
+
+	example
+	-------
+	Suppose that the specified matrices are given by
+
+		     [[1., 2., 0.],		   [[0., 1., 1.],
+		m1 =  [0., 1., 0.],    and    m2 =  [1., 0., 1.],
+		      [3., 0., 2.]]                 [1., 1., 5.]]
+
+	Then, the call Matrix_hadamard(m1, m2) returns the matrix
+
+		[[0., 2.,  0.], 
+		 [0., 0.,  0.], 
+		 [3., 0., 10.]]
 	*/
 	assert((Matrix_dim(m1, 0) == Matrix_dim(m2, 0)) && (Matrix_dim(m1, 1) == Matrix_dim(m2, 1)));
 	return populate_matrix(Matrix_new(Matrix_dim(m1, 0), Matrix_dim(m1, 1)), Matrix_hadamard_populate, m1, m2);
@@ -273,6 +350,19 @@ Matrix Matrix_matmul(Matrix m1, Matrix m2) {
 	-------
 	Matrix
 		The matrix multiplication of the specified matrices. 
+
+	example
+	-------
+	Suppose that the specified matrices are given by
+
+		     [[1., 0., 0.],		   [[0., 1., 2.],
+		m1 =  [0., 1., 0.]]    and    m2 =  [1., 0., 1.],
+						    [1., 1., 0.]]
+
+	Then, the call Matrix_matmul(m1, m2) returns the matrix
+
+		[[0., 1., 2.], 
+		 [1., 0., 1.]] 
 	*/
 	assert(Matrix_dim(m1, 1) == Matrix_dim(m2, 0));
 	return populate_matrix(Matrix_new(Matrix_dim(m1, 0), Matrix_dim(m2, 1)), Matrix_matmul_populate, m1, m2);
@@ -287,12 +377,25 @@ Matrix Matrix_transpose(Matrix m) {
 	arguments
 	---------
 	Matrix : m
-		The matrix to be transposed.
+		The matrix to transpose.
 
 	returns
 	-------
 	Matrix
 		The transpose of the specified matrix.
+
+	example
+	-------
+	Suppose that the specified matrix is given by
+
+		    [[1., 2.], 
+		m =  [3., 4.],
+		     [5., 6.]]
+
+	Then, the call Matrix_transpose(m) returns the matrix
+
+		[[1., 3., 5.], 
+		 [2., 4., 6.]]
 	*/
 	return populate_matrix(Matrix_new(Matrix_dim(m, 1), Matrix_dim(m, 0)), Matrix_transpose_populate, m);
 }
@@ -312,6 +415,18 @@ double Matrix_sum(Matrix m) {
 	-------
 	double
 		The sum of the elements of the specified matrix.
+
+	example
+	-------
+	Suppose that the specified matrix is given by
+
+		    [[1., 2.], 
+		m =  [3., 4.],
+		     [5., 6.]]
+
+	Then, the call Matrix_sum(m) returns the scalar
+
+		1. + 2. + 3. + 4. + 5. + 6. = 21.
 	*/
 	double sum = 0.0;
 	for(int i = 0; i < Matrix_dim(m, 0); i++) {
@@ -337,6 +452,17 @@ double Matrix_frobenius_norm(Matrix m) {
 	-------
 	double
 		The Frobenius norm of the specified matrix.
+
+	example
+	-------
+	Suppose that the specified matrix is given by
+
+		    [[1., 2.], 
+		m =  [3., 4.]]
+
+	Then, the call Matrix_frobenius_norm(m) returns the scalar
+
+		sqrt(1.^2 + 2.^2 + 3.^2 + 4.^2) = sqrt(30.)
 	*/
 	Matrix prod = Matrix_hadamard(m, m);
 	double norm = sqrt(Matrix_sum(prod));
@@ -348,7 +474,7 @@ double Matrix_frobenius_norm(Matrix m) {
 
 double Matrix_get(Matrix m, int i, int j) {
 	/*
-	Return the entry of the specified matrix with the specified indices.
+	Return the element of the specified matrix with the specified indices.
 
 	arguments
 	---------
@@ -364,7 +490,17 @@ double Matrix_get(Matrix m, int i, int j) {
 	returns
 	-------
 	double
-		The entry of the specified matrix with the specified indices.
+		The element of the specified matrix with the specified indices.
+
+	example
+	-------
+	Suppose that the specified matrix and indices are given by
+
+		    [[1.0, 2.0, 3.0], 
+		m =  [4.0, 5.0, 6.0],    and    i = 1    and    j = 2
+		     [7.0, 8.0, 9.0]]
+
+	Then, the call Matrix_get(m, i, j) returns the scalar 6.0.
 	*/
 	assert((i >= 0 && i < Matrix_dim(m, 0)) && (j >= 0 && j < Matrix_dim(m, 1)));
 	return m->matrix[i][j];
@@ -388,6 +524,18 @@ Vector Matrix_get_row(Matrix m, int i) {
 	-------
 	Vector
 		The row of the specified matrix with the specified index.
+
+	example
+	-------
+	Suppose that the specified matrix and index are given by
+
+		    [[1.0, 2.0, 3.0], 
+		m =  [4.0, 5.0, 6.0],    and    i = 1
+		     [7.0, 8.0, 9.0]]
+
+	Then, the call Matrix_get_row(m, i) returns the vector
+
+		[4.0, 5.0, 6.0]
 	*/
 	assert(i >= 0 && i < Matrix_dim(m, 0));
 	Vector v = Vector_new(Matrix_dim(m, 1));
@@ -399,7 +547,7 @@ Vector Matrix_get_row(Matrix m, int i) {
 
 void Matrix_set(Matrix m, int i, int j, double val) {
 	/*
-	Set the entry of the specified matrix with the specified
+	Set the element of the specified matrix with the specified
 	indices to the specified value.
 
 	arguments
@@ -415,6 +563,17 @@ void Matrix_set(Matrix m, int i, int j, double val) {
 
 	double : val
 		The value to set.
+
+	example
+	-------
+	Suppose that the specified matrix, indices, and value are given by
+
+		    [[1.0, 2.0, 3.0], 
+		m =  [4.0, 5.0, 6.0],    and    i = 1    and    val = 10.0
+		     [7.0, 8.0, 9.0]]           j = 2
+
+	Then, the call Matrix_set(m, i, j, val) changes the value 6.0 in m
+	to the value 10.0.
 	*/
 	assert((i >= 0 && i < Matrix_dim(m, 0)) && (j >= 0 && j < Matrix_dim(m, 1)));
 	m->matrix[i][j] = val;
@@ -456,10 +615,19 @@ void Matrix_print(Matrix m) {
 	returns
 	-------
 	void
+
+	example
+	-------
+	Suppose that the specified matrix is given by
+
+		    [[1.0, 2.0, 3.0], 
+		m =  [4.0, 5.0, 6.0],
+		     [7.0, 8.0, 9.0]]
+
+	Then, the call Matrix_print(m) prints m as displayed above.
 	*/
-	printf("[");
 	for(int i = 0; i < Matrix_dim(m, 0); i++) {
-		printf(i ? " [" : "[");
+		printf(i ? " [" : "[[");
 		int j;
 		for(j = 0; j < Matrix_dim(m, 1) - 1; j++) {
 			printf("%.3f, ", Matrix_get(m, i, j));
@@ -473,7 +641,7 @@ void Matrix_print(Matrix m) {
 
 int Matrix_dim(Matrix m, int dim) {
 	/*
-	Return the row or column dimension of the specified matrix.
+	Return the row/column dimension of the specified matrix.
 
 	arguments
 	---------
@@ -481,13 +649,23 @@ int Matrix_dim(Matrix m, int dim) {
 		The matrix the dimension is with respect to.
 
 	int : dim
-		If 0, return the row dimension.
-		If 1, return the column dimension.
+		If 0, return the number of rows.
+		If 1, return the number of columns.
 
 	returns
 	-------
 	int
-		The row or column dimension of the specified matrix.
+		The row/column dimension of the specified matrix.
+
+	example
+	-------
+	Suppose that the specified matrix is given by
+
+		    [[1.0, 2.0, 3.0], 
+		m =  [4.0, 5.0, 6.0]]
+
+	Then, the calls Matrix_dim(m, 0) and Matrix_dim(m, 1) 
+	return 2 and 3, respectively.
 	*/
 	assert(dim == 0 || dim == 1);
 	return dim ? m->dim1 : m->dim0;
