@@ -1,1 +1,1 @@
-# RKHS_regression_in_C
+Reproducing kernel Hilbert space (RKHS) regression in C.
