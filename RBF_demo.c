@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
 					  1.41725225,  0.7444949 , -0.90753406, -1.71688677, -2.23987508,
 					 -1.67742056, -1.26793114, -0.03016832, -0.0385695 ,  0.8976368);
 
-	double s = 0.2;    // RBF kernel tuning parameter
-	double r = 0.4;    // regularization tuning parameter
+	double s = 0.2;    // RBF kernel tuning parameter     (chosen via trial and error... should be chosen via cross-validation)
+	double r = 0.4;    // regularization tuning parameter (chosen via trial and error... should be chosen via cross-validation)
 	double lr = 0.001; // gradient descent learning rate
 	int n = 5000;      // number of gradient descent iterations
 
